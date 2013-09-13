@@ -34,7 +34,6 @@ var braintree_settings = {
 console.log(braintree_settings);
 var gateway = braintree.connect(braintree_settings);
 
-
 app.post('/card', function(request, response){
 
     var cardParams = {
@@ -61,6 +60,16 @@ app.post('/card', function(request, response){
         onCreateCard(response, cardParams, err, result);
     });
 
+});
+
+app.get('/heartbeat', function(request, response) {
+    if (isUndefined(gateway.config.merchantId) || isUndefined(gateway.config.publicKey)) {
+        response.writeHead(503);
+        response.end("Braintree has no config");
+        return;
+    }
+
+    response.end();
 });
 
 // bubble up error from gateway. return true if error did occur
@@ -128,6 +137,10 @@ function needToCreateCustomer(result) {
     }
     return false;
     
+}
+
+function isUndefined(variable) {
+  return typeof variable === 'undefined';
 }
 
 // run server
